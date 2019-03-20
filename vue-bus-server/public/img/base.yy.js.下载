@@ -1,0 +1,285 @@
+/**
+ * Created by yy on 2016/8/26.
+ */
+//轮播
+var roll={
+    int:{
+        posNum:0,
+        version:'',
+        speed:3000
+    },
+    nodeFn:function(box){//节点循环轮播
+        var box=$(box);
+        var len=$('li',box).length;
+        var minW=$('li',box).width();
+        $(box).width(minW*len);
+        $('.prev-btn',box.parent().parent()).click(prev);
+        $('.next-btn',box.parent().parent()).click(next);
+        function next(){
+            $(box).stop().animate({marginLeft:-minW},3000 *0.1, function () {
+                box.css({'marginLeft': '0'});
+                $(this).append($("li",this).first());
+            });
+        }
+        function prev(){
+            box.prepend($("li",box).last()).css('marginLeft',-minW).stop().animate({marginLeft:0},3000*0.1);
+        }
+        if(roll.int.version=='1'){
+            $('li',box).hover(function(){
+                $(this).addClass('hover').siblings().removeClass('hover');
+                $('.booth .zoom-warp img,.zoom-box img').attr('src',$('img',this).attr('src'));
+            })
+        }
+    },
+    seamlessFn: function (box) {//无缝轮播
+        var box=$(box),
+            imgBox=$('.img-box',box),
+            btnBox=$('.btn-box',box),
+            numBox=$('.num-box',box),
+            img=$('li',imgBox),
+            imgW=box.width(),
+            len=img.length;
+        img.width(imgW);
+        imgBox.append(img.first().clone()).width(imgW*(len+1));
+        $('li',numBox).first().addClass('current'); //给第一个圆点添加样式
+        var t=setInterval(next,roll.int.speed);
+        box.hover(function(){
+            btnBox.show();
+            clearInterval(t);
+        },function(){
+            btnBox.hide();
+            t=setInterval(next,roll.int.speed);
+        });
+        $('li',numBox).hover(function(){
+            clearInterval(t);
+            var _index=$(this).index();
+            imgBox.stop().animate({left:-_index*imgW},roll.int.speed *.6);
+            $('li',numBox).eq(_index).addClass('current').siblings().removeClass('current');
+        }, function () {
+            t=setInterval(next,roll.int.speed);
+        })
+        $('.prev',btnBox).unbind('click').click(prev);
+        $('.next',btnBox).unbind('click').click(next);
+        function prev(){
+            roll.int.posNum--;
+            if(roll.int.posNum<0){
+                roll.int.posNum=len-1;
+                imgBox.css({left:-len*imgW});
+            }
+            imgBox.stop().animate({
+                left: -imgW*roll.int.posNum
+            }, roll.int.speed *.5, function () {
+                $('li',numBox).eq(roll.int.posNum).addClass('current').siblings().removeClass('current');
+            });
+        }
+        function next(){
+            roll.int.posNum++;
+            if(roll.int.posNum>len){
+                roll.int.posNum=1;
+                imgBox.css({left:0});
+            }
+            imgBox.stop().animate({
+                left: -imgW*roll.int.posNum
+            }, roll.int.speed *.5, function () {
+
+                $('li',numBox).eq(roll.int.posNum>=len?0:roll.int.posNum).addClass('current').siblings().removeClass('current');
+            });
+
+        }
+    },
+    sideFn: function (box) {//无缝轮播
+        var box=$(box);
+        var len=$('li',box).length;
+        var minW=$('li',box).outerWidth();
+        $(box).width(minW*len);
+        $('.prev-btn',box.parent().parent()).off("click").click(prev);
+        $('.next-btn',box.parent().parent()).off("click").click(next);
+        function next(){
+            if(roll.int.posNum>len-6){
+            $(".next-btn").addClass("notPoint");
+                return;
+            }
+            roll.int.posNum++;
+            box.stop().animate({marginLeft:-minW*roll.int.posNum},3000 *0.1);
+        }
+        function prev(){
+            if(roll.int.posNum<1){
+                $(".prev-btn").addClass("notPoint");
+                return;
+            }
+            roll.int.posNum--;
+            box.stop().animate({marginLeft:-minW*roll.int.posNum},3000*0.1);
+        }
+        if(roll.int.version=='1'){
+            $('li',box).hover(function(){
+                $(this).addClass('hover').siblings().removeClass('hover');
+                $('.booth .zoom-warp img,.zoom-box img').attr('src',$('img',this).attr('src'));
+            })
+        }
+
+    }
+}
+//选项卡
+var drop={
+    hover: function (bar,box) {
+        $(bar).hover(function () {
+            var index=$(bar).index(this);
+            $(this).addClass('current').siblings().removeClass('current');
+            $(box).eq(index).show();
+        }, function () {
+            $(box).hide();
+        })
+    }
+}
+//返回顶部
+function BackTop() {
+    $('body,html').animate({ scrollTop: 0 }, 1000);
+}
+
+var cookie={
+    setFn: function (CookName,Value,Days) {
+        var exp = new Date(),cookieVal;
+        if(arguments.length == 3){
+            exp.setDate(exp.getDate() + Days);
+            cookieVal =CookName+'='+Value+',;expires='+ exp.toGMTString();
+        }else if(arguments.length == 2){
+            var Days = 14;
+            exp.setDate(exp.getDate() + Days);
+            cookieVal =CookName+'='+Value+',;expires='+ exp.toGMTString();
+        }else if (arguments.length ==1) {
+            var Value = String(exp.getTime()) + parseInt(Math.random() * 1000000000), Days = 14;
+        } else {
+            var CookName="username",Value = String(exp.getTime()) + parseInt(Math.random() * 1000000000), Days = 14;
+        }
+        exp.setDate(exp.getDate() + Days);
+        cookieVal = CookName + "=" + Value + ((exp == null) ? "" : ";expires=" + exp.toGMTString());
+        document.cookie = cookieVal;
+    },
+    getFn: function (CookName) {
+        if (CookName) {
+            var c_name = CookName;
+        } else {
+            var c_name = 'username';
+        }
+        if (document.cookie.length > 0) {
+            var c_start = document.cookie.indexOf(c_name + "=")
+            if (c_start != -1) {
+                c_start = c_start + c_name.length + 1;
+                var c_end = document.cookie.indexOf(";", c_start);
+                if (c_end == -1)
+                    c_end = document.cookie.length;
+                return unescape(document.cookie.substring(c_start, c_end));
+            }
+        }
+        return "";
+    }
+}
+//获取时间
+function getTime() {
+    var date = new Date()
+        ,
+        Y = date.getFullYear() + '-'
+        ,
+        M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+        ,
+        D = (date.getDate()<10?'0'+date.getDate():date.getDate()) + ' '
+        ,
+        h = (date.getHours()<10?'0'+date.getHours():date.getHours()) + ':'
+        ,
+        m = (date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes()) + ':'
+        ,
+        s = (date.getSeconds()<10?'0'+date.getSeconds():date.getSeconds())
+        , Time = Y + M + D + h + m + s;
+    return Time;
+}
+//ajax
+function ajax(url,successfn,completefn){
+    url=getUrlHost+url;
+    $.ajax({
+        type : "get",
+        url : url,
+        dataType : "jsonp",
+        success : function(data){
+            data=$.parseJSON(data);
+            if(data.error){
+                if(data.error=='0'){
+                    successfn(data);
+                }else{
+                    CPM(data.error, '确认');
+                }
+            }else{
+                successfn(data);
+            }
+        },
+        error: function (data) {
+            console.log(data);
+        },
+        complete: function (data) {
+            if(completefn){
+                completefn(data);
+            }
+        }
+    })
+}
+
+
+
+
+
+
+
+
+
+
+function floor($changtu,$nums,flag) {
+    var roll;
+    var $changtu = $changtu;
+    var $num=$nums;
+    var $numlist=$nums.children('li')
+    var $imgList = $changtu.children('li');
+    var imgW = $imgList.outerWidth();
+    var lens = $imgList.length;
+    $changtu.append($imgList.first().clone());
+    $changtu.width(imgW*(lens+1));
+    var num2 = 0;
+    $numlist.first().addClass('current'); //给第一个圆点添加样式
+    if(!flag){ clearInterval(roll); roll = setInterval(move, 3000);}
+    $numlist.hover(function(){
+        clearInterval(roll);
+        num2=$(this).index();
+        $changtu.stop().animate({left:-num2*imgW},500);
+        $numlist.eq(num2).addClass('current').siblings().removeClass('current');
+    }, function () {
+        if(!flag){  clearInterval(roll);roll = setInterval(move, 3000);}
+    })
+    function move(){
+        num2++;
+        if(num2>lens){
+            num2=1;$changtu.css({left:0});
+        }
+        $changtu.stop().animate({
+            left: -imgW*num2
+        }, 500, function () {
+            $numlist.eq(num2>=lens?0:num2).addClass('current').siblings().removeClass('current');
+        });
+
+    }
+}
+
+
+function tab(tabtit,tabcon) {
+    $(tabcon).hide();
+    $(tabtit+" li:first").addClass("current").show();
+    $(tabcon+":first").show();
+
+    $(tabtit+" li").click(function() {
+        $(tabtit+" li").removeClass("current");
+        $(this).addClass("current");
+        $(tabcon).hide();
+        var activeTab = $(this).attr("tab");
+        console.log(activeTab);
+        $("#"+activeTab).fadeIn();
+        return false;
+    });
+
+}

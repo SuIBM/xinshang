@@ -1,0 +1,648 @@
+$(function(){
+	if(isLogin!=1&&page!='loginpage'){
+		var showLoginPop=getCookie("showLoginPop");
+		console.log('showLoginPop='+showLoginPop);
+		if(showLoginPop==null||showLoginPop==''||showLoginPop!='1'){
+			console.log('timeout');
+			setTimeout(function(){
+				console.log('show');
+//				 $('.mode').show();
+				 addCookie("showLoginPop","1",30);
+		    },5000);
+		}
+	}
+	
+	var jumpPage="";
+	var downloadLayerState=getCookie('downloadLayerState');
+	if(downloadLayerState=="1"){
+        $('#popUp-div').css({marginLeft:-$(window).width()});
+        $('#putUp-div').removeClass('none');
+    }
+    // 分页
+    $('.pageNum .pageN').unbind("click").click(function(){
+        $(this).addClass('current').siblings().removeClass('current');
+    });
+    // 扫一扫
+    $('header .down').hover(function () {
+        $('header .hover-box').removeClass('sel');
+        $('header .hover-btn').removeClass('triangle');
+        $('header .down-code').addClass('sel');
+    },function () {
+        $('header .down-code').removeClass('sel');
+    });
+    $('footer .hover-btn').hover(function () {
+        $('footer .hover-box').addClass('sel');
+    },function () {
+        $('footer .hover-box').removeClass('sel');
+    });
+    // 扫一扫
+    // 搜索
+    $('header .search').unbind("click").click(function () {
+        $('header .hover-btn').removeClass('triangle');
+        $(this).addClass('triangle');
+        $('header .hover-box').removeClass('sel');
+        $('header .search-box').addClass('sel');
+        $('#search').focus();
+    });
+
+    // 搜索(update)
+    $('.search-box').mouseleave(function(){
+        $('header .search-box').removeClass('sel');
+        $('header .search').removeClass('triangle');
+    });
+    // 导航栏鼠标滑过效果
+    $('header .nav-left a:not(.drop)').hover(function () {
+        $(this).siblings().removeClass('current').removeClass('triangle');
+        $('header .drop-box .drop-down').removeClass('sel');
+    },function () {
+        $('header .nav-left .drop').removeClass('current').removeClass('triangle');
+        $('header .drop-box .drop-down').removeClass('sel');
+    })
+    $('header .nav-left .drop').hover(function () {
+        $(this).addClass('current').siblings().removeClass('current');
+        $('header .hover-box').removeClass('sel');
+        $(this).addClass('triangle').siblings().removeClass('triangle');
+        $('header .drop-box .drop-down').eq($('header .nav-left .drop').index(this)).addClass('sel').siblings().removeClass('sel');
+    }, function () {
+
+	});
+
+    $('header .drop-box .drop-down').mouseleave(function(){
+        $('header .drop-box .drop-down').removeClass('sel');
+        $('header .nav-left .drop').removeClass('triangle').removeClass('current');
+    });
+    // 导航栏鼠标滑过效果
+
+    //喜欢
+    $('.purchase span').unbind("click").click(function(){
+        $(this).toggleClass('current');
+        jumpPage="favor";
+    	if(isLogin==1){
+    		var goodsId=$(this).attr("data-info");
+    		var addType=$(this).attr("data-type");
+    		updateFavor(goodsId,addType);
+    		if(addType=='1'){
+    			$(this).attr("data-type","2");
+    		}else{
+    			$(this).attr("data-type","1");
+    		}
+
+    		 return;
+    	}
+        $('.mode').show();
+    });
+    
+    $('.like').unbind("click").click(function(){
+    	if(isLogin==1){
+    		$(this).toggleClass('current');
+    		jumpPage="favor";
+    		var goodsId=$(this).attr("data-info");
+    		var addType=$(this).attr("data-type");
+    		updateFavor(goodsId,addType);
+    		if(addType=='1'){
+    			$(this).attr("data-type","2");
+    		}else{
+    			$(this).attr("data-type","1");
+    		}
+
+    		 return;
+    	}
+        $('.mode').show();
+    });
+    var goodsId=0;
+    var goodsNum=0;
+
+     //下拉框
+    $('.drop .linone').unbind("click").click(function(){
+        var myLi = $(this).html();
+        $('.drop .liplay').html(myLi);
+    });
+    $('.choice-inner .opt .linone').unbind("click").click(function(){
+        var myLi = $(this).html();
+        $('.choice-inner .opt  .liplay').html(myLi);
+    });
+
+    //仅看有货,仅看白手套
+    $('.flip .column li').unbind("click").click(function(){
+        if(!$(this).hasClass('current')){
+            $(this).addClass('current').siblings().removeClass('current');
+        }else{
+            $(this).removeClass('current');
+        };
+    });//仅看有货,仅看白手套
+    $('.choice-box .radio li').unbind("click").click(function(){
+        $(this).toggleClass('current');
+    });
+
+    $("#getcode_num,#getcode_num-bottom").click(function(){
+		$(this).attr("src","/captcha?"+ (new Date()).valueOf());
+	});
+
+    // 侧浮
+    //     $(window).scroll(function(event) {
+    //         var sT = $(window).scrollTop() + 220;
+    //         $('.newPeople').stop().animate({'top':''+sT+'px'},500);
+    //     });
+    //     $('.closeNP').unbind("click").click(function(){
+    //         $(this).parent('.newPeople').fadeOut(500);
+    //     });
+
+    // 验证手机号是否正确
+    $('#phone','#phone-bottom').blur(function(){
+    	 var phone=$(this).val();
+    	if(!checkPhone(phone)){
+    		  return;
+    	}
+    });
+    $('#phone','#phone-bottom').keyup(function(){
+   	    var phone=$(this).val(),$getCode;
+        if($(this).is('#phone')){
+            $getCode=$("#getCode");
+        }else{
+            $getCode=$("#getCode-bottom");
+        }
+   	    if(phone==null||phone==''||phone.length<11){
+            $getCode.attr("class","obtain c-gray");
+   	    	return;
+   	    }
+   	    if ((/^(1[0-9])[0-9]{9}$/).test(phone)){
+            $getCode.attr("class","obtain");
+   	    	$('#errorMsg').html('');
+   	    	return;
+        }
+        if($(this).is('#phone')){
+   	    		$('#errorMsg').html('亲，手机号错误！');
+   	    }else{
+        	alert('亲，手机号错误！');
+		}
+   });
+    $('#imgCheckCode,#imgCheckCode-bottom').keyup(function(){
+   	    var imgCheckCode=$(this).val(),$getCode,$phone;
+        if($(this).is('#imgCheckCode')){
+            $getCode=$("#getCode");
+            $phone=$('#phone');
+        }else{
+            $getCode=$("#getCode-bottom");
+            $phone=$('#phone-bottom');
+        }
+   	    if(imgCheckCode==null||imgCheckCode==''||imgCheckCode.length!=4){
+            $getCode.attr("class","obtain c-gray").unbind("click");
+   	    	return;
+   	    }
+   	    checkImgCode($phone,this,$getCode);
+   });
+
+    $('#phone').focus(function(){
+        $('#phoneError').html('');
+    });
+
+    // 登录
+    $('#login').unbind("click").click(function(){
+    	jumpPage="login";
+    	if(isLogin==1){
+    		jump();
+    		return;
+   	     }
+        $('.mode').show();
+    });
+    $('#rightLogin').unbind("click").click(function(){
+    	jumpPage="login";
+    	if(isLogin==1){
+    		jump();
+    		return;
+   	     }
+        $('.mode').show();
+    });
+    $('#favors').unbind("click").click(function(){
+        jumpPage="favors";
+        if(isLogin==1){
+            jump();
+            return;
+        }
+
+        $('.mode').show();
+    });
+    $('#orders').unbind("click").click(function(){
+        jumpPage="orders";
+        if(isLogin==1){
+            jump();
+            return;
+        }
+
+        $('.mode').show();
+    });
+    $('#purchase').click(function(){
+        jumpPage="purchase";
+        if(isLogin==1){
+            jump();
+            return;
+        }
+
+        $('.mode').show();
+    });
+
+	function updateFavor( goodsId, addType){
+		var mobile = $("#phone").val();
+		$.ajax({
+			type:'POST',
+			url:hostStr+'user/goods/like',
+			data:{goodsId:goodsId,addType:addType},
+			dataType:'json',
+			success:function(data){
+				var result=data.code;
+			},
+			error:function(err){
+				return;
+			}
+		});
+	}
+
+    $('#loginButton').click(function(){
+    	 var phone=$("#phone").val();
+    	 if(!checkPhone(phone)){
+    		 return;
+    	 }
+         var checkCode=$("#checkCode").val();
+         if(checkCode==null||checkCode==''){
+        	 $('#errorMsg').html('请输入验证码！');
+        	 return;
+         }
+		 var loginEntry = 1;
+         login(phone,checkCode);
+    });
+	
+	// 底部浮框登录
+	$('#loginButton-bottom').click(function(){
+    	 var phone=$("#phone-bottom").val();
+    	 if(!checkPhone(phone)){
+    		 return;
+    	 }
+         var checkCode=$("#checkCode-bottom").val();
+         if(checkCode==null||checkCode==''){
+             alert('请输入验证码!');
+        	 return;
+         }
+		 var loginEntry = 3;
+         login(phone,checkCode);
+    });
+
+    $('#getCode').unbind("click").click(function(){
+        var mobile = $("#phone").val();
+    	if(!checkPhone(mobile)){
+   		  return;
+   	    }
+        sendCode("#phone","#imgCheckCode",this);
+   });
+
+    $('#getCode-bottom').unbind("click").click(function(){
+    	if(!checkPhone($("#phone-bottom").val())){
+   		  return;
+   	    }
+        sendCode("#phone-bottom","#imgCheckCode-bottom",this);
+   });
+    $('#changeImgCode').unbind("click").click(function(){
+    	$("#getcode_num").attr("src","/captcha?"+ (new Date()).valueOf());
+   });
+
+    // 倒计时获取验证码
+    function  countdown(){
+        var visible=$("#getCode").is(":visible");
+        if(visible){
+            var getCode=$("#getCode");
+		}else{
+            var getCode=$("#getCode-bottom");
+		}
+        if(getCode.html()=='获取验证码'){
+            var number = 30;
+            var timer01 = null;
+            getCode.css('background','#999').html(''+number+'S后再获取');
+            timer01 = setInterval(function(){
+                number --;
+                getCode.html(''+number+'S后再获取');
+                if(number == 0){
+                    getCode.css('background','#333').html('获取验证码');
+                    clearInterval(timer01);
+                    getCode.unbind("click").bind("click",function(){
+                        if(visible){
+                            if(!checkPhone($("#phone").val())){
+                                return;
+                            }
+                            sendCode("#phone","#imgCheckCode",getCode);
+                        }else{
+                            if(!checkPhone($("#phone-bottom").val())){
+                                return;
+                            }
+                            sendCode("#phone-bottom","#imgCheckCode-bottom",getCode);
+                        }
+                    });
+                };
+            },1000);
+        };
+    }
+    // 关闭登录窗口
+    $('.close').unbind("click").click(function(){
+        $(this).parent().parent('.mode').hide();
+    });
+
+    // 提示弹框
+
+    // 关闭弹框
+    $('.bomb-box .close').unbind("click").click(function(){
+        $('.bomb-box-mode').hide();
+    });
+    $('.bomb-box button').unbind("click").click(function(){
+        $('.bomb-box-mode').hide();
+    });
+  //检查图片验证码是否正确
+	function checkImgCode(moblie,imgCheckCode,$getCode){
+		$('#errorMsg').html("");
+        $getCode.attr("class","obtain").unbind("click").bind("click",function(){
+			if(!checkPhone($(moblie).val())){return;}
+			sendCode(moblie,imgCheckCode,$getCode);
+	     });
+	}
+  //检查图片验证码是否正确
+	function sendCode(mobile,imgCheckCode,$getCode){
+		var $mobile = $(mobile).val();
+		var $imgCheckCode = $(imgCheckCode).val();
+		$($getCode).unbind("click");
+
+		$.ajax({
+			type:'POST',
+			url:hostStr+'userlogin/validateCode',
+			data:{mobile:$mobile,imgCheckCode:$imgCheckCode},
+			dataType:'json',
+			success:function(data){
+                // 1, "手机号格式错误，请重新输入
+                // 3, "请填写图形验证码
+                // 4, "图片验证码不正确
+                // 2, "获取验证码错误！
+                // 0, "获取成功！
+				console.log(data.code)
+				//删除上一次的图片验证码
+				removeimgCheckCode();
+				if(data.code!=0){
+					if(data.code==='2'||data.code=='3'||data.code=='4'){
+						$("#imgCheckCode,#imgCheckCode-bottom").val("");
+						if($($getCode).is("#getCode")){
+                            $("#checkCodeDiv").show();
+                            $('#errorMsg').html(data.msg);
+							$("#getcode_num").attr("src","/captcha?"+ (new Date()).valueOf());
+                        }else{
+                            $("#popUp-div .verI").show();
+							$("#getcode_num-bottom").attr("src","/captcha?"+ (new Date()).valueOf());
+							alert(data.msg);
+                        }
+					}
+
+					$($getCode).attr("class","obtain c-gray").unbind("click").bind("click",function(){
+                        if(!checkPhone($mobile)){
+							return;
+                       	}
+                        sendCode(mobile,imgCheckCode,$getCode);
+                    });
+				}else{
+					$("#checkCode,#checkCode-bottom").attr("placeholder","请填写验证码").removeAttr("readOnly");
+					$('#errorMsg').html("");
+					$("#imgCheckCode,#imgCheckCode-botom").val("");
+                    $("#checkCodeDiv,#popUp-div .verI").hide();
+					countdown();
+				}
+				
+				$("#getcode_num,#getcode_num-bottom").unbind("click").click(function () {
+					$(this).attr("src","/captcha?"+ (new Date()).valueOf());
+				});
+
+				return;
+			},
+			error:function(err){
+				return;
+			}
+		});
+	}
+	
+	/**
+	* 删除上次填写的图片验证码
+	*/
+	function removeimgCheckCode(){
+		$("#imgCheckCode").val("");
+		$("#imgCheckCode-bottom").val("");
+	}
+	
+	function login(mobile,code){
+		// var mobile = $("#phone").val();
+		// var code = $("#checkCode").val();
+		$.ajax({
+			type:'POST',
+			url:hostStr+'userlogin/login',
+			data:{account:mobile,password:code},
+			dataType:'json',
+			success:function(data){
+                // 1,登陆失败
+                // 2,登陆成功(新用户)
+                // 3,登陆成功(老用户)
+				if(data.code==1){
+				    if($(".mode").is(":visible")){
+                        $('#errorMsg').html(data.msg);
+                    }else{
+                        alert(data.msg);
+                    }
+				}else{
+					 sa.login(data.userId);
+					 sa.track('pc_login');
+				    // 新手登录送券提示框
+					$('.mode').hide();
+					if(data.code==2){
+						 $('.login-success').append("<p>100元现金券已放入您的个人账号</p>");
+					}
+					 // 新手登录后送券提示框
+				    $('.login-success').fadeIn(500);
+				     setTimeout(function(){
+				        $('.login-success').fadeOut(500,function(){
+				            jump();
+				        });
+				    },2000);
+
+				}
+				return;
+			},
+			error:function(err){
+				return;
+			}
+		});
+	}
+
+
+	function jump(){
+		 var jumpUrl="";
+		 if("favors"==jumpPage){
+			 jumpUrl=hostStr+"user/goods/like/list";
+		 }
+		 if("orders"==jumpPage){
+			 jumpUrl=hostStr+"user/myorder/";
+		 }
+		 if("purchase"==jumpPage){
+			 var goodsIdInfo=$("#purchase").attr("goods-info");
+			 var goodsNumInfo=$("#purchase").attr("goods-num");
+			 jumpUrl=hostStr+"order/goodsconfirm?goodsId="+goodsIdInfo+"&goodsNum="+goodsNumInfo;
+		 }
+
+		 if(jumpUrl==null||jumpUrl==''){
+			 jumpUrl=$("#fromurl").val();
+		 }
+		 if(jumpUrl==null||jumpUrl==''){
+			 window.location.reload();
+		 }else{
+			 window.location.href=jumpUrl;
+		 }
+	}
+    //底部轮播
+    $('footer .tab-left').unbind("click").click(function () {
+        var g=Number($('footer .tab').data('pos'))-1;
+        if (g < 0) {
+            g =$('footer .tab-list').length-1 ;
+        }
+        $('footer .tab-list').css('display','none');
+        $($('footer .tab-list')[g]).css('display','block');
+        $('footer .tab').data('pos',g);
+    })
+    $('footer .tab-right').unbind("click").click(function () {
+        var g=Number($('footer .tab').data('pos'))+1;
+        if (g > $('footer .tab-list').length-1) {
+            g =0 ;
+        }
+        $('footer .tab-list').css('display','none');
+        $($('footer .tab-list')[g]).css('display','block');
+        $('footer .tab').data('pos',g);
+    })
+    //底部轮播
+	// 底部浮框
+	$("#putUp-div").unbind("click").click(function () {
+		$(this).addClass('none');
+		$('#popUp-div').animate({marginLeft:"0"},500,"swing");
+        addCookie('downloadLayerState',0,365);
+    })
+    $("#popUp-div .close").unbind("click").click(function () {
+        $('#popUp-div').animate({marginLeft:-$(window).width()},500,"swing",function () {
+            $('#putUp-div').removeClass('none');
+        });
+        addCookie('downloadLayerState',1,365);
+    })
+    // 底部浮框
+})
+
+
+function checkPhone(phone){
+	var visible=$("#getCode").is(":visible");
+   	 if(phone==null||phone==''){
+		if(!visible){
+            alert('亲，请输入手机号！');
+            $("#getCode-bottom").css('background','#999');
+		}else{
+            $('#errorMsg').html('亲，请输入手机号！');
+            $("#getCode").css('background','#999');
+		}
+       	 return false;
+        }
+   	 if (!(/^(1[0-9])[0-9]{9}$/).test(phone)){
+         if(!visible){
+             alert('亲，请输入正确的手机号！');
+             $("#getCode-bottom").css('background','#999');
+         }else{
+             $('#errorMsg').html('亲，请输入正确的手机号');
+             $("#getCode").css('background','#999');
+         }
+            return false;
+        };
+    if(!visible){
+        $("#getCode-bottom").css('style','');
+    }else{
+        $("#getCode").attr("style","");
+        $('#errorMsg').html('');
+    }
+        return true;
+    }
+function bombbox(par1,par2,par3){
+    $('.bomb-box-mode').show();
+    $('.bomb-box h3').html(par1);
+    $('.bomb-box p').html(par2);
+    if(par3!=null&&par3!=''){
+    	   $('.bomb-box button a').html(par3);
+    }
+
+}
+function isForbiddenPop(){
+    var isChrome = window.navigator.userAgent.indexOf("Chrome") !== -1;
+    return isChrome;
+}
+var curHost="91xinshang.com";
+function addCookie(objName, objValue, objHours){
+    var str = objName + "=" + escape(objValue);
+    if (objHours > 0) {
+        var date = new Date();
+        var ms = objHours * 24 * 3600 * 1000;
+        date.setTime(date.getTime() + ms);
+        str += "; expires=" + date.toGMTString();
+        str += "; domain=" + curHost;
+        str += "; path=/";
+    }
+    document.cookie = str;	
+}
+
+function getCookie(objName){
+    var arrStr = document.cookie.split("; ");
+    for (var i = 0; i < arrStr.length; i++) {
+        var temp = arrStr[i].split("=");
+        if (temp[0] == objName)
+            return unescape(temp[1]);
+    }
+    return null;
+}
+
+function uniqid() {
+    var a = 21,
+    b = ( + (new Date)).toString(16).toUpperCase(),
+    c = [],
+    d = "0123456789ABCDEF".split("");
+    for (var e = a; e--; c[c.length] = d[Math.random() * 16 << 0]);
+    return c.splice(Math.random() * a << 0, 0, b),
+    c = c.join(""),
+    c
+}
+var uuid = getCookie("_uuid");
+if(uuid == null || uuid == ''){
+	  uuid = uniqid();
+	  addCookie('_uuid',uuid,365);
+}
+function getUrlParam(name) {
+	 var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+	 var r = window.location.search.substr(1).match(reg);
+	 if (r != null) return unescape(r[2]); return null;
+}
+var aid = getUrlParam('aid');
+if(aid){
+	addCookie('aid',aid,30);
+}
+var channel = getUrlParam('channel');
+if(channel){
+	addCookie('channel',channel,30);
+}
+var cid = getUrlParam('cid');
+if(cid){
+	addCookie('cid',cid,30);
+}
+var wi = getUrlParam('wi');
+if(wi){
+	addCookie('wi',wi,30);
+}
+var unionId=getUrlParam('union_id');
+var euid=getUrlParam('euid');
+var mid=getUrlParam('mid');
+var cps="";
+if(aid && channel && cid && wi){
+    cps="yiqifa|"+aid+"|"+channel+"|"+cid+"|"+wi;
+    addCookie('cps', cps, 0)
+}else if(unionId && euid) {
+    cps="duomai|"+unionId+"|"+euid+"|"+mid;
+    addCookie('cps', cps, 0)
+}

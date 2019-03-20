@@ -1,0 +1,81 @@
+/*footer开始*/
+footer{background: #f7f7f7;}
+footer .hot-brand{width: 100%;height: 484px;border-top: 1px solid #E2E2E2;}
+footer .hot-brand .container{height: 484px;}
+footer .hot-brand h2{font-size: 15px;color: #24252F;text-align: center;margin-top: 25px;}
+footer .footer-font{width: 192px;height: 238px;float: left;margin-top: 40px;margin-right: 130px;}
+footer .footer-font a{color: #24252F;}
+footer .footer-font li{font-size: 12px;margin-bottom: 7px;}
+footer .footer-font1{margin-left: 33px;}
+footer .QR-code{width: 50px;height: 82px;float: left;margin-top: 50px;}
+footer .QR-code a{font-size: 12px;color: #24252F;}
+footer .QR-code .QR-code-font{margin-top: 22px;width: 54px;}
+footer .all-search{margin-left: 33px;font-size: 12px;color: #24252F;}
+footer .hot-brand .friendly-link{height: 80px;border-top: 1px solid #E2E2E2;margin-top: 20px;padding: 25px 0px 15px 30px;}
+footer .friendly-link p{height: 80px;overflow: auto;padding-right: 30px;}
+footer .friendly-link span{display: inline-block;margin-right: 21px;margin-bottom: 6px;color: #8A8A8A;}
+footer .friendly-link p::-webkit-scrollbar{
+    width: 6px;
+    height: 16px;
+    background-color: #ddd;
+    border-radius: 3px;
+}
+/*定义滚动条的轨道，内阴影及圆角*/
+footer .friendly-link p::-webkit-scrollbar-track{
+    border-radius: 3px;
+    background-color: #ddd;
+}
+/*定义滑块，内阴影及圆角*/
+footer .friendly-link p::-webkit-scrollbar-thumb{
+    width: 4px;
+    height: 10px;
+    border-radius: 2px;
+    background-color: #fff;
+}
+
+footer .bottom{width: 100%;height: 78px;border-top: 1px solid #E2E2E2;text-align: center;}
+footer .bottom p{color: #666;margin-top: 26px;}
+footer .bottom b{;margin: 26px 16px 0 16px;}
+footer .bottom span{display: inline-block;margin-top: 26px;margin-right: 8px;}
+footer .bottom .last-font{border-bottom: 1px solid #999;}
+footer .bottom .bottom-font1,footer .bottom .bottom-font2{display: inline-block;}
+footer .last-font a{color: #666;}
+footer span *{vertical-align: middle;}
+footer .down-code{top:197px;}
+/*footer结束*/
+
+/*底部滑块-start*/
+#putUp-div{width: 160px;height: 160px;position:fixed;left:0;bottom:0;z-index: 88;}
+.download-layer .putup-img {width: auto;height: 160px;cursor: pointer;}
+#popUp-div{background: #fff2f2;margin-left: 0;width:100%;position:fixed;left:0;bottom:0;z-index: 88;}
+.download-layer .popUp-left{float:left;width: 363px;height: 160px;}
+.download-layer .popUp-right{float:left;width: 343px;height: 160px;position: relative;}
+.download-layer .popUp-middle{float:left;width:354px;height: 160px;}
+.download-layer .input-left{float:left;width:220px;padding-right: 14px;position: relative;}
+.download-layer .input-left .bor-box{height: 36px;border:1px solid #e3e3e3;border-radius: 5px;background: #fff;margin-bottom: 6px;font-size: 13px;overflow: hidden;padding-left: 14px;}
+.download-layer .input-right{position: absolute;top:50%;right:0;width:120px;height: 36px;border-radius: 5px;text-align: center;background: #fc655e;color:#fff;line-height: 36px; -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);}
+.download-layer .input-right a{width:100%;height: 100%;}
+.download-layer input{height: inherit;width:100%;font-size: inherit;}
+.download-layer img{height: inherit;width:100%;font-size: 0;}
+.download-layer #checkCode-bottom{float: left;width:106px;}
+.download-layer #getCode-bottom{float: left;width:90px;height: 26px;background: #666;color:#fff;border-radius: 13px;margin: 4px 0;}
+.download-layer  .input-left .verI{margin: 0;}
+.download-layer  .input-left .verIyz{width:116px;margin: 0 8px 0 0;}
+.download-layer  .input-left .verPhoto{width:78px;margin:0;}
+.download-layer  .input-left .verIyz input,.download-layer .input-left .verPhoto{padding: 0;}
+.download-layer .input-box,.download-layer .login-out{position: relative;top:50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);}
+.download-layer .user-img{width:46px;height: 46px;overflow: hidden;border-radius: 50%;margin: 0 auto;}
+.download-layer .usr-name{font-size: 16px;colro:#333;line-height: 26px;}
+.download-layer .login-out-btn{font-size: 14px;colro:#333;line-height: 30px;width:100px;height: 30px;background: #fff;margin: 15px auto 0;}
+.download-layer .close{position: absolute;right:20px;top:66px;width:26px;height: 26px;}
+
+/*底部滑块-end*/

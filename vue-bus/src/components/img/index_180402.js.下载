@@ -1,0 +1,360 @@
+var swiper = new Swiper('.swiper-container', {
+    autoplay: true,
+    loop: true,
+    navigation: {
+        nextEl: '.swiper-button-next',
+    },
+    pagination: {
+        el: '.swiper-pagination',
+    }
+});
+function ajax(url, successfn, completefn) {
+    $.ajax({
+        type: "get",
+        url: "http://api.91sph.com/" + url,
+        dataType: "jsonp", //数据类型为jsonp
+        success: function (data) {
+            data = $.parseJSON(data.replace(/\r\n/g,"").replace(/\r/g,"").replace(/\n/g,""));
+            (data.error == '0' || !data.error) ? successfn(data) : (CPM(data.error.indexOf('不合法参数') >= 0 ? "此活动需要登录后分享才能参加哟,请尽快提醒您的好友登录后再分享吧~~~" : data.error, '确认'));
+        },
+        error: function (data) {
+            console.log(data);
+        },
+        complete: function (data) {
+            if (completefn) completefn(data);
+        }
+    })
+};
+
+var xs = {
+    banner: {
+        hover: function () {
+            $(".banner .active").mouseover(function (e) {
+                e.stopPropagation();
+                $(".banner .active,.banner .entering").addClass("sel");
+                $(".banner .next").css({right: "7.5%"});
+            });
+            $(".banner .active").mouseout(function (e) {
+                e.stopPropagation();
+                $(".banner .active,.banner .entering").removeClass("sel");
+
+                $(".banner .next").css({right: "3%"});
+            });
+
+            $(".banner .entering").mouseover(function (e) {
+                e.stopPropagation();
+                $(".inner .active,.inner .entering").addClass("sel1");
+                $(".banner .next").css({right: "12%"});
+            });
+            $(".banner .entering").mouseout(function (e) {
+                e.stopPropagation();
+                $(".banner .active,.banner .entering").removeClass("sel1");
+                $(".banner .next").css({right: "3%"});
+            });
+        },
+        next: function () {
+            $(".banner .next").click(function (e) {
+                $(".inner .active,.inner .entering").addClass("sel2");
+                if ($(".inner li:last-child").is(".entering")) {
+                    $(".inner li").eq(0).addClass("will-enter entering");
+                } else {
+                    $(".inner li.entering").next().addClass("will-enter entering");
+                }
+                $(".inner .entering:not(.will-enter)").removeClass("sel2 entering").addClass("active");
+                var tt = setTimeout(function () {
+                    $(".inner .active.sel2").removeClass("active");
+                    clearTimeout(tt);
+                }, 900);
+                var ttt = setTimeout(function () {
+                    $(".inner .sel2").removeClass("sel2");
+                    $(".inner .will-enter").removeClass("will-enter");
+                    clearTimeout(ttt);
+                }, 20000);
+            })
+        },
+        main: function () {
+            // xs.banner.hover();
+            xs.banner.next();
+        }
+    },
+    brand: {
+        CN: function () {
+            // 中文品牌排序
+            ajax("brandFirstLetter/ajax", function (data) {
+                xs.brand.ajax(data,"cn");
+                xs.brand.click();
+                $(".cn .brandFirst ul li").click(function () {
+                    $(".brandList .wow.fadeInUp").removeClass("wow fadeInUp");
+                    var index = $(".cn .brandFirst ul li").index(this) + 1;
+                    $(".cn .listBox li:nth-child(" + index + "),.cn .brandFirst ul li:nth-child(" + index + ")").addClass("check").siblings().removeClass("check");
+                    var len=Number($(".brandList.check .list.check").attr("len"))||0;
+
+                    if(len<=12){
+                        $(".more").hide();
+                    }else{
+                        $(".more").show();
+                        if ($(".cn .listBox li:nth-child(" + index + ")").is(".auto")) {
+                            $(".more").addClass("auto").html("收起");
+                        } else {
+                            $(".more").removeClass("auto").html("查看剩余"+(len-12)+"项")
+                        }
+                    }
+
+                })
+            })
+        },
+        EN: function () {
+            // 英文品牌排序
+            ajax("brandEnFirstLetter/ajax", function (data) {
+                xs.brand.ajax(data,"en");
+                xs.brand.click();
+                $(".en .brandFirst ul li").click(function () {
+                    $(".brandList .wow.fadeInUp").removeClass("wow fadeInUp");
+                    var index = $(".en .brandFirst ul li").index(this) + 1;
+                    $(".en .listBox li:nth-child(" + index + "),.en .brandFirst ul li:nth-child(" + index + ")").addClass("check").siblings().removeClass("check");
+                    var len=Number($(".brandList.check .list.check").attr("len"))||0;
+                    console.log(len)
+                    if(len<=12){
+                        $(".more").hide();
+                    }else{
+                        $(".more").show();
+                        if ($(".en .listBox li:nth-child(" + index + ")").is(".auto")) {
+                            $(".more").addClass("auto").html("收起");
+                        } else {
+                            $(".more").removeClass("auto").html("查看剩余"+(len-12)+"项")
+                        }
+                    }
+                })
+            })
+        },
+        ajax:function (data,type) {
+            var content="",listContent="";
+            $.each(data, function (i) {
+                var listCon = "",len=data[i].length;
+                content += "<li>" + i + "</li>";
+                $(data[i]).each(function (a, b) {
+                    if(b.pcLogo){
+                        listCon += "<a href=\"http://91xinshang.com/brand-"+b.py+"\" class=\"col-s-2\" target='_blank'><img src='http://img.91xinshang.com/" + b.pcLogo + "' alt=''><span>" + b.name + "<br>" + b.chName + "</span></a>";
+                    }else{
+                        len--;
+                        return;
+                    }
+
+                })
+                listContent += "<li class='list' len='"+len+"'>" + listCon + "</li>";
+            })
+            $("."+type+" .brandFirst ul").append(content);
+            $("."+type+" .listBox").append(listContent);
+        },
+        click:function () {
+            $(".brand .listBox li .col-s-2").hover(function (e) {
+                $(this).addClass("sel");
+            }, function (e) {
+                $(this).removeClass("sel");
+            });
+        },
+        set: function () {
+            // 品牌
+            xs.brand.CN();
+            xs.brand.EN();
+            xs.brand.click();
+            $(".brand .btnBox b").click(function () {
+                var index = $(".brand .btnBox b").index(this);
+                $(".brandList .wow.fadeInUp").removeClass("wow fadeInUp");
+                $(this).addClass("check").siblings().removeClass("check");
+                if (index) {
+                    $(".cn").addClass("check").siblings(".brandList").removeClass("check");
+                } else {
+                    $(".en").addClass("check").siblings(".brandList").removeClass("check");
+                }
+            })
+        }
+    },
+    cate: {
+        // 品类
+        sub: function () {
+            ajax("goodscate/list/ajax", function (data) {
+                $.each(data, function (i) {
+                    $(".cateBox").append("<li class='subCate subCate" + i + "'><div class=\"swiper\"></div></li>");
+                    var content = "", type = "";
+                    switch (i) {
+                        case "83":
+                            type = "bag";
+                            break;
+                        case "84":
+                            type = "acc";
+                            break;//配饰
+                        case "85":
+                            type = "shoes";
+                            break;
+                        case "86":
+                            type = "yifu";
+                            break;//fuzhuang
+                        case "87":
+                            type = "shoushi";
+                            break;
+                        case "88":
+                            type = "watch";
+                            break;
+                        case "89":
+                            type = "peijian";
+                            break;
+                    }
+                    $(data[i]).each(function (index, obj) {
+                        content += " <a href=\"http://91xinshang.com/" + type + "/s" + obj.value + "/?isduo=no\" target='_blank'><div class=\"imgBox\"><img src=\"" + obj.picUrl + "\" alt=\"\"></div><p>" + obj.label + "</p></a>"
+                    })
+                    $(".cateBox li.subCate" + i + " .swiper").html(content).width(180 * data[i].length);
+                    $(".shop .cate").eq(3).addClass("check").siblings().removeClass("check");
+                    $(".cateBox .subCate").eq(3).addClass("check").siblings().removeClass("check");
+                    xs.cate.hover();
+                })
+                xs.cate.arr();
+            })
+        },
+        hover: function () {
+            $(".shop .cate").hover(function () {
+                var index = parseInt(this.className.replace(/cate/g, "")) + 82;
+                $(this).addClass("check").siblings().removeClass("check");
+                $(".cateBox .subCate" + index).addClass("check").siblings().removeClass("check");
+                if ($(".subCate.check .swiper").width() < 1200) {
+                    $(".arrNext,.arrPrev").addClass("noClick");
+                } else {
+                    var clickNum = $(".cate.check").attr("clickNum") || 0, len = $(".subCate.check a").length;
+                    if (clickNum != 0) {
+                        $(".arrPrev").removeClass("noClick");
+                        if (clickNum >= len - 6) {
+                            $(".arrNext").addClass("noClick");
+                        } else {
+                            $(".arrNext").removeClass("noClick");
+                        }
+                    } else {
+                        $(".arrPrev").addClass("noClick");
+                        $(".arrNext").removeClass("noClick");
+                    }
+
+
+                }
+            });
+        },
+        arr: function () {
+            // 左右箭头控制
+            $(".arr").off("click").click(function (e) {
+                e.stopPropagation();
+                if ($(this).is(".noClick")) {
+                    return;
+                } else {
+                    var clickNum = Number($(".cate.check").attr("clickNum")) || 0,
+                        len = $(".subCate.check a").length;
+                    if ($(this).is(".arrNext")) {
+                        clickNum = clickNum + 6;
+                        $(".cate.check").attr("clickNum", clickNum);
+                        $(".arrPrev").removeClass("noClick");
+                        if (clickNum >= len - 6) $(this).addClass("noClick");
+                    } else {
+                        clickNum = clickNum - 6;
+                        $(".cate.check").attr("clickNum", clickNum);
+                        $(".arrNext").removeClass("noClick");
+                        if (clickNum == 0) $(this).addClass("noClick");
+                    }
+                    $(".subCate.check .swiper").animate({"margin-left": -clickNum * ($(".subCate a").width()+2)}, 500)
+                }
+            })
+        }
+    },
+    boutique: function () {
+        $(".boutique .col-s-6").each(function (index, obj) {
+            var url = "xz/list/ajax?pageIndex=1&goodsState=1&bizType=10&rankSort=4&brandId=";
+            if (index == 0) {
+                url += "1,3,2,4,12,20,8,5,25,110,26,37,7,16"
+            } else {
+                url += "21,34,42,47,22,9,24,23,32,105,105,148,127,124"
+            }
+            ;
+            ajax(url, function (data) {
+                var list = data.data.result, content = "";
+                $(list).each(function (a, b) {
+                    if (a < 4) {
+                        content += " <a href=\"http://91xinshang.com/xianzhi/" + b.goodsId + ".html\" class=\"col-s-3\" target='_blank'>" +
+                            "<div class=\"goodsBox\">" +
+                            "<div class=\"imgBox\"><img src=\"" + b.goodsThumb + "\" alt=\"\"></div>" +
+                            "<p class=\"brandName\">" + b.brandName + "</p>" +
+                            "<p class=\"goodsName\">￥" + b.salePrice + "</p>" +
+                            "</div>" +
+                            "</a>";
+                    }
+                });
+                $(".boutique .col-s-6").eq(index).after(content);
+            })
+        })
+    },
+    promise: function () {
+        // 心上承诺
+        $(".promise .img").hover(function () {
+            $(".inner", this).addClass("sel");
+        }, function () {
+            $(".promise .inner").removeClass("sel");
+        });
+    }
+}
+$(document).ready(function () {
+    xs.brand.set();
+    $(".swiper-button-next,.nextBg,#banner").height($(".swiper-slide img").height());
+    xs.cate.sub();
+    xs.boutique();
+    xs.promise();
+    xs.banner.main();
+    ajax("orderstat/getOrderStat",function (data) {
+        $(".sell .red").html(data);
+    })
+    $(".sell .list a").click(function () {
+        $(".download").show();
+    })
+
+    $("#backTop").hover(function () {
+        $(this).html(" <img src=\"http://static.91xinshang.com/pc/images/index/backTop.png\" alt=\"\">").off("click").click(function () {
+            $("html,body").animate({scrollTop: 0}, 1000);
+        })
+    }, function () {
+        $(this).html("置顶")
+    });
+
+
+});
+window.addEventListener("resize", function() {
+    var height=$(".swiper-slide img").height()<($(window).width()*0.7135*75/137)?($(window).width()*0.7135*75/137):$(".swiper-slide img").height();
+    $(".swiper-button-next,.nextBg,#banner").height(height);
+    if(!getCookie("downloadLayerState")){
+        if($(window).width()<855){
+            $('#popUp-div').animate({marginLeft: -$(window).width()}, 500, "swing", function () {$('#putUp-div').removeClass('none');});
+        }else{
+            $('#popUp-div').animate({marginLeft: "0"}, 500, "swing", function () {$('#putUp-div').addClass('none');});
+
+        }
+    }
+
+    if(parseInt($('#popUp-div').css("marginLeft"))<0&&parseInt($('#popUp-div').css("marginLeft"))>-$(window).width())$('#popUp-div').css("marginLeft",-$(window).width());
+}, false);
+$(".brand .more").click(function () {
+    $(".brandList .wow.fadeInUp").removeClass("wow fadeInUp");
+    var len=Number($(".brandList.check .list.check").attr("len"))-12||0;
+    if ($(this).is(".auto")) {
+        $(this).html("查看剩余"+len+"项");
+        $(".brand .list.check,.brand .more").removeClass("auto");
+        // $("html,body").animate({scrollTop:Number($(this).attr("scrollTop"))});
+    } else {
+        console.log($(this).offset().top)
+        $(this).html("收起").attr("scrollTop", $(this).offset().top-300);
+        $(".brand .list.check,.brand .more").addClass("auto");
+    }
+})
+$(window).scroll(function () {
+    $(window).scrollTop() > $(window).height() ? $("#backTop").show() : $("#backTop").hide();
+    $(".wow.box.fadeInUp").each(function (a,b) {
+        if(b.style.visibility=="visible"){
+            var times=setTimeout(function () {
+                $(b).addClass("noBg");
+                clearTimeout(times);
+            },1000);
+        }
+    })
+});

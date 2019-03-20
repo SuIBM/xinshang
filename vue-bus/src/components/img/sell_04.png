@@ -1,0 +1,63 @@
+
+ 
+
+
+
+
+<script type="text/javascript">
+    $(".kef").hover(function(){
+        $(this).css({
+            "width":"100px",
+            "right":"-62px"
+        });
+        $(this).find("img").attr("src","http://static.91xinshang.com/pc/images/homepage-img/im2.jpg");
+        $(this).stop(true,false).animate({"right":0},300)
+    },function(){
+        $(this).stop(true,false).animate({"right":"-62px"},300,function(){
+            $(".kef").css({"width":"38px","right":"0px"});
+            $(this).find("img").attr("src","http://static.91xinshang.com/pc/images/homepage-img/im1.jpg");
+        });
+    })
+
+    function validLogin(){
+        if(isLogin == 1){
+            return true;
+        }
+        $('.mode').show();
+        return false;
+    }
+</script>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>您所访问的页面不存在-心上</title>
+    <meta property="og:type" content="image"/>
+	<meta property="og:image" content="http://static.91xinshang.com/pc/images/logo_200x200.png"/>
+	<meta name="applicable-device" content="pc"/>
+    <meta name="mobile-agent" content="format=html5;url=http://m.91xinshang.com/"/>
+    <link rel="Shortcut Icon" href="http://static.91xinshang.com/pc/images/favicon.ico">  
+<link rel="Bookmark" href="http://static.91xinshang.com/pc/images/favicon.ico">  
+<!--link rel="stylesheet" type="text/css" href="http://static.91xinshang.com/pc/css/header.yy.css?version=20180510" /-->
+ <link rel="stylesheet" href="http://static.91xinshang.com/pc/css/common/header.css?version=20180510">
+ <link rel="stylesheet" type="text/css" href="http://static.91xinshang.com/pc/css/common/footer.css?version=20180510" />
+    <link rel="stylesheet" href="http://static.91xinshang.com/pc/css/error.css">
+</head>
+<body>
+<div class="main-box">
+    <div class="container">
+        <div class="error-img">
+            <img src="http://static.91xinshang.com/pc//images/error-img/error-img.jpg" alt="">
+        </div>
+        <p class="font-1">抱歉提示您：您跳转的页面不存在</p>
+        <p class="font-2">推荐您返回：
+        	<a href="http://91xinshang.com/">心上首页</a>
+            <a href="http://91xinshang.com/brand">品牌大全</a>
+            <a href="http://91xinshang.com/yh">奢品养护</a>
+            <a href="http://91xinshang.com/app.html">下载APP</a>
+            <a href="http://91xinshang.com/zta">全部热门搜索词</a>
+           </p>
+    </div>
+</div>
+</body>
+</html>

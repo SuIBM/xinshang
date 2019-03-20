@@ -1,0 +1,52 @@
+function getUrlParam(name) {
+	 var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+	 var r = window.location.search.substr(1).match(reg);
+	 if (r != null) return unescape(r[2]); return null;
+}
+
+//添加cookie
+function setCookie(CookName,Value,Days) {
+    var exp = new Date(),cookieVal;
+    if(arguments.length == 3){
+        exp.setDate(exp.getDate() + Days);
+        cookieVal =CookName+'='+Value+',;expires='+ exp.toGMTString();
+    }else if(arguments.length == 2){
+        var Days = 14;
+        exp.setDate(exp.getDate() + Days);
+        cookieVal =CookName+'='+Value+',;expires='+ exp.toGMTString();
+    }else if (arguments.length ==1) {
+        var Value = String(exp.getTime()) + parseInt(Math.random() * 1000000000), Days = 14;
+    } else {
+        var CookName="username",Value = String(exp.getTime()) + parseInt(Math.random() * 1000000000), Days = 14;
+    }
+    exp.setDate(exp.getDate() + Days);
+    cookieVal = CookName + "=" + Value + ((exp == null) ? "" : ";expires=" + exp.toGMTString());
+    document.cookie = cookieVal;
+}
+//获取cookie
+function getCookie(CookName) {
+    if (CookName) {
+        var c_name = CookName;
+    } else {
+        var c_name = 'username';
+    }
+    if (document.cookie.length > 0) {
+        c_start = document.cookie.indexOf(c_name + "=")
+        if (c_start != -1) {
+            c_start = c_start + c_name.length + 1;
+            c_end = document.cookie.indexOf(";", c_start);
+            if (c_end == -1)
+                c_end = document.cookie.length;
+            return unescape(document.cookie.substring(c_start, c_end));
+        }
+    }
+    return "";
+}
+
+
+$(function(){  
+    var semtjId = getUrlParam('semtj');
+    if(semtjId){
+    	setCookie("semtjId",semtjId,15);
+    }
+}) 
